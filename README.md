@@ -10,7 +10,7 @@ Store the sorted numbers along with the sort direction and time taken to perform
 Display the sorted numbers, sort direction, and time taken to the user.
 Provide feedback to the user about the success of the operation, validation issues, or errors.
 
-##Setup
+## Setup
 To run the application locally:
 
 Clone the repository to your local machine.
