@@ -1,4 +1,4 @@
-### Sorting Application
+### Sorting Numbers
 
 ## Overview
 This is a web application built using ASP.NET Core that allows users to enter a variable amount of numbers, sort them in ascending or descending order, and view the results. The sorted numbers along with the sort direction and time taken to perform the sort are stored in a database.
