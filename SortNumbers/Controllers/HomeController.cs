@@ -70,22 +70,7 @@ namespace SortNumbers.Controllers
 
             _context.SaveChanges();
 
-            return RedirectToAction("SortResult", "Home", entry.Entity);
-        }
-
-
-        public async Task<IActionResult> SortResult(int id)
-        {
-            var sortResult = await _context.SortResults
-                .Include(sr => sr.SortedNumbers)
-                .FirstOrDefaultAsync(sr => sr.Id == id);
-
-            if (sortResult == null)
-            {
-                return NotFound();
-            }
-
-            return View(sortResult);
+            return View("SortResult", entry.Entity);
         }
 
         [HttpGet("Download/{id}")]
