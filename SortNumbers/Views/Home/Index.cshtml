@@ -1,4 +1,6 @@
-﻿@{
+﻿@model SortNumbers.ViewModels.AddSequenceViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -11,15 +13,17 @@
         <div class="col-md-6">
             <form asp-action="PostNumbers" method="post" class="border p-4 rounded shadow">
                 <div class="mb-3">
-                    <label for="numbers" class="form-label">Enter whole numbers (comma-separated):</label>
-                    <input type="text" id="numbers" name="numbers" class="form-control" required>
+                    <label asp-for=Numbers class="form-label">Enter whole numbers (comma-separated):</label>
+                    <input asp-for=Numbers type="text" class="form-control" required>
+                    <span asp-validation-for="Numbers" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label for="sortOrder" class="form-label">Choose sorting order:</label>
-                    <select id="sortOrder" name="sortOrder" class="form-select" required>
+                    <label asp-for=Ordering class="form-label">Choose sorting order:</label>
+                    <select asp-for=Ordering class="form-select" required>
                         <option value="asc">Ascending</option>
                         <option value="desc">Descending</option>
+                        <span asp-validation-for="Ordering"></span>
                     </select>
                 </div>
 

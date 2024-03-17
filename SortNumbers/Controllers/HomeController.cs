@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SortNumbers.Data;
 using SortNumbers.Models;
+using SortNumbers.ViewModels;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
@@ -21,22 +22,40 @@ namespace SortNumbers.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View(new AddSequenceViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostNumbers(string numbers, string sortOrder)
+        public async Task<IActionResult> PostNumbers(AddSequenceViewModel model)
         {
-            int[] nums = numbers.Split(',').Select(int.Parse).ToArray();
+            var nums = new List<int>();
+
+            if(model.Ordering != "desc" && model.Ordering != "asc")
+            {
+                ModelState.TryAddModelError(nameof(AddSequenceViewModel.Ordering), "Invalid sort order");
+                return View("Index", model);
+            }
+
+            foreach (var num in model.Numbers.Split(','))
+            {
+                if(!int.TryParse(num, out var parsedNumber))
+                {
+                    ModelState.TryAddModelError(nameof(AddSequenceViewModel.Numbers), $"Number {num} is not a valid number");
+                    return View("Index", model);
+                }
+
+                nums.Add(parsedNumber);
+            }
+
             var start = DateTime.Now;
 
-            if (sortOrder == "desc")
+            if (model.Ordering == "desc")
             {
-                nums = nums.OrderByDescending(x => x).ToArray();
+                nums = nums.OrderByDescending(x => x).ToList();
             }
             else
             {
-                nums = nums.OrderBy(x => x).ToArray();
+                nums = nums.OrderBy(x => x).ToList();
             }
 
             var timeTaken = DateTime.Now - start;
@@ -44,7 +63,7 @@ namespace SortNumbers.Controllers
 
             var entry = await _context.SortResults.AddAsync(new Models.SortResult
             {
-                IsAscending = sortOrder != "desc",
+                IsAscending = model.Ordering != "desc",
                 TimeTaken = timeTaken,
                 SortedNumbers = nums.Select(x => new SortedNumber { Value = x }).ToList()
             });
@@ -72,6 +91,11 @@ namespace SortNumbers.Controllers
         [HttpGet("Download/{id}")]
         public async Task<IActionResult> DownloadAsJson(int id)
         {
+            if(id < 1)
+            {
+                return BadRequest();
+            }
+
             var sortResult = await _context.SortResults
               .Include(sr => sr.SortedNumbers)
               .FirstOrDefaultAsync(sr => sr.Id == id);
