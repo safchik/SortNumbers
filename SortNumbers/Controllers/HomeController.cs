@@ -30,7 +30,7 @@ namespace SortNumbers.Controllers
         {
             var nums = new List<int>();
 
-            if(model.Ordering != "desc" && model.Ordering != "asc")
+            if (model.Ordering != "desc" && model.Ordering != "asc")
             {
                 ModelState.TryAddModelError(nameof(AddSequenceViewModel.Ordering), "Invalid sort order");
                 return View("Index", model);
@@ -38,9 +38,9 @@ namespace SortNumbers.Controllers
 
             foreach (var num in model.Numbers.Split(','))
             {
-                if(!int.TryParse(num, out var parsedNumber))
+                if (!int.TryParse(num, out var parsedNumber))
                 {
-                    ModelState.TryAddModelError(nameof(AddSequenceViewModel.Numbers), $"Number {num} is not a valid number");
+                    ModelState.TryAddModelError(nameof(AddSequenceViewModel.Numbers), $"Number {num} is not a valid number. Valid number range is between {int.MinValue} and {int.MaxValue}");
                     return View("Index", model);
                 }
 
@@ -59,7 +59,7 @@ namespace SortNumbers.Controllers
             }
 
             var timeTaken = DateTime.Now - start;
-            
+
 
             var entry = await _context.SortResults.AddAsync(new Models.SortResult
             {
@@ -91,7 +91,7 @@ namespace SortNumbers.Controllers
         [HttpGet("Download/{id}")]
         public async Task<IActionResult> DownloadAsJson(int id)
         {
-            if(id < 1)
+            if (id < 1)
             {
                 return BadRequest();
             }
