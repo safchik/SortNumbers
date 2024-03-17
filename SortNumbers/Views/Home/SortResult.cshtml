@@ -1,0 +1,33 @@
+﻿@model SortNumbers.Models.SortResult
+@{
+    var downloadAsJsonurl = Url.ActionLink("DownloadAsJson", "Home", new { id = Model.Id });
+}
+
+
+<h1>Sort Results</h1>
+
+@if (Model != null)
+{
+    <h2>Sorted Numbers:</h2>
+    <ul>
+        @foreach (var sortedNumber in Model.SortedNumbers)
+        {
+            <li>@sortedNumber.Value</li>
+        }
+    </ul>
+
+    <h2>Sort Direction:</h2>
+    <p>@(Model.IsAscending ? "Ascending" : "Descending")</p>
+
+    <h2>Time Taken:</h2>
+    <p>@Model.TimeTaken.ToString()</p>
+
+    <a href="@downloadAsJsonurl">Download results</a><br />
+
+}
+else
+{
+    <p>No sort results available.</p>
+}
+
+<a asp-action="Index">Back to Input Form</a>
