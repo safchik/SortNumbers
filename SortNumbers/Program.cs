@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SortNumbers.Data;
 using SortNumbers.Models;
+using SortNumbers.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IOrderingService, OrderingService>();
 
 
 var app = builder.Build();

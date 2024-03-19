@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SortNumbers.Data;
 using SortNumbers.Models;
+using SortNumbers.Services;
 using SortNumbers.ViewModels;
 using System.Diagnostics;
 using System.Text;
@@ -12,12 +13,12 @@ namespace SortNumbers.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly IOrderingService _orderingService;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, IOrderingService orderingService)
         {
             _logger = logger;
-            _context = context;
+            _orderingService = orderingService;
         }
 
         public IActionResult Index()
@@ -47,30 +48,11 @@ namespace SortNumbers.Controllers
                 nums.Add(parsedNumber);
             }
 
-            var start = DateTime.Now;
+            var sortedResult = await _orderingService.Sort(nums.ToArray(), model.Ordering == "asc");
 
-            if (model.Ordering == "desc")
-            {
-                nums = nums.OrderByDescending(x => x).ToList();
-            }
-            else
-            {
-                nums = nums.OrderBy(x => x).ToList();
-            }
+           
 
-            var timeTaken = DateTime.Now - start;
-
-
-            var entry = await _context.SortResults.AddAsync(new Models.SortResult
-            {
-                IsAscending = model.Ordering != "desc",
-                TimeTaken = timeTaken,
-                SortedNumbers = nums.Select(x => new SortedNumber { Value = x }).ToList()
-            });
-
-            _context.SaveChanges();
-
-            return View("SortResult", entry.Entity);
+            return View("SortResult", sortedResult);
         }
 
         [HttpGet("Download/{id}")]
@@ -81,9 +63,7 @@ namespace SortNumbers.Controllers
                 return BadRequest();
             }
 
-            var sortResult = await _context.SortResults
-              .Include(sr => sr.SortedNumbers)
-              .FirstOrDefaultAsync(sr => sr.Id == id);
+            var sortResult = await _orderingService.GetSortResultById(id);
 
             if (sortResult == null)
             {
